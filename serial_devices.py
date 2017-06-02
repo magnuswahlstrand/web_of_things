@@ -14,15 +14,35 @@ lock = threading.Lock()
 
 current_data = []
 
+
+class LedDisplay:
+  def __repr__(self):
+    return "Led"
+class PressureSensor:
+  def __repr__(self):
+    return "Pressure"
+class TempSensor:
+  def __repr__(self):
+    return "Temp"
+class Gyro:
+  def __repr__(self):
+    return "Gyro"
+
+def get_capabilities():
+  possible_capabilities = [Gyro(), LedDisplay(), PressureSensor(), TempSensor()] 
+  return random.sample(set(possible_capabilities), random.randint(0, len(possible_capabilities)-1))
+
+
 def new_serial_device(port):
   id_length = 8
   device_ttl = random.choice([5,10,15]) 
   return {
-    'id'    : uuid.uuid4().hex[:id_length+1],
-    'port'  : port,
-    'ttl'   : device_ttl,
-    'max_ttl'  : device_ttl,
-    'alive' : True # Use to simulate devices disconnecting
+    'id'            : uuid.uuid4().hex[:id_length+1],
+    'port'          : port,
+    'ttl'           : device_ttl,
+    'max_ttl'       : device_ttl,
+    'alive'         : True, # Use to simulate devices disconnecting
+    'capabilities'  : get_capabilities()
   }
 
 def get_device_data():
@@ -46,6 +66,7 @@ def run_simulation():
     table['port'] = [ device['port'] for device in serial_devices]
     table['ttl'] = [ device['ttl'] for device in serial_devices]
     table['alive'] = [ device['alive'] for device in serial_devices]
+    table['capabilities'] = [ ",".join("%15s" % cap for cap in map(str,device['capabilities'])) for device in serial_devices]
     print("")
     df = pd.DataFrame(table)
 
@@ -56,10 +77,11 @@ def run_simulation():
     not_used_ports = set(serial_ports) - used_ports
     
     # Add empty rows for not used ports
-    df_empty = pd.DataFrame([ ['-',port,'',''] for port in not_used_ports ], columns=['id','port','ttl','alive'])
+    df_empty = pd.DataFrame([ ['-',port,'','',''] for port in not_used_ports ], columns=['id','port','ttl','alive','capabilities'])
     df = df.append(df_empty,ignore_index=True)      
     df = df.sort_values(by=["port"], ascending=[True])
-    print(df[['port','id','ttl','alive']])
+    pd.set_option('display.width', 1000)
+    print(df[['port','id','ttl','alive','capabilities']])
     print("")
 
 
