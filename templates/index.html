@@ -1,0 +1,67 @@
+<html>
+<head>
+    <title>Presentation DataTable - Example 1 </title>
+<script type="text/javascript" src="//code.jquery.com/jquery-1.12.4.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+      <link rel="stylesheet" href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css" />
+
+<script type="text/javascript" src="https://cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.flash.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/pdfmake.min.js"></script>
+<script type="text/javascript" src="//cdn.rawgit.com/bpampuch/pdfmake/0.1.27/build/vfs_fonts.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.print.min.js"></script>
+
+<style type="text/css">
+    
+.not_alive {
+    color: lightgray;
+}
+
+</style>
+
+<script type="text/javascript">
+
+
+$(document).ready(function() {
+    dt = $('#example').DataTable( {
+        "ajax": {
+            "url": "devices",
+            "dataSrc": ""
+        },
+        "headers": ["Port"],
+        "columns": [
+            { "data": "port" },
+            { "data": "id" },
+            { "data": "ttl" }
+        ],
+        "createdRow": function ( row, data, dataIndex ) {
+            console.log(row);
+            console.log(data);
+            if ( ! data['alive'] ) {
+              $(row).addClass( 'not_alive' );
+            }
+        }
+    } );
+
+
+
+    setInterval( dt.ajax.reload, 1000 );
+
+} );
+
+</script>
+</head>
+<body>
+
+
+
+
+<table id="example" class="display" width="100%">
+
+</table>
+
+</body>
+</html>
