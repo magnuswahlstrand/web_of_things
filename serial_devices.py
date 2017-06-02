@@ -16,17 +16,48 @@ current_data = []
 
 
 class LedDisplay:
+
+  def __init__(self):
+    self.text = "Hi"
+
+  def update(self):
+    pass
+
   def __repr__(self):
-    return "Led"
+    return "Led(%s)" % self.text
+
+
 class PressureSensor:
+
+  def __init__(self):
+    self.pressure = random.randint(10,90)
+
+  def update(self):
+    pass
+
   def __repr__(self):
-    return "Pressure"
+    return "Pressure(%i)" % self.pressure
+
+
 class TempSensor:
+  def __init__(self):
+    self.temp = random.randint(45,75)
+  
+  def update(self):
+    self.temp += random.randint(-1,1)
+
   def __repr__(self):
-    return "Temp"
+    return "Temp(%i)" % self.temp
+
 class Gyro:
+  def __init__(self):
+    self.acc = random.random()
+
+  def update(self):
+    self.acc += 0.1*random.random()
+
   def __repr__(self):
-    return "Gyro"
+    return "Gyro(%.3f)" % self.acc
 
 def get_capabilities():
   possible_capabilities = [Gyro(), LedDisplay(), PressureSensor(), TempSensor()] 
@@ -60,13 +91,21 @@ def run_simulation():
 
   while(1):
     os.system('cls')  # on windows
+
+    # Update status of capabilities
+    for device in serial_devices:
+      for cap in device['capabilities']:
+        cap.update()
     
     table = {}
     table['id'] =   [ device['id'] for device in serial_devices]
     table['port'] = [ device['port'] for device in serial_devices]
     table['ttl'] = [ device['ttl'] for device in serial_devices]
     table['alive'] = [ device['alive'] for device in serial_devices]
+
+
     table['capabilities'] = [ ",".join("%15s" % cap for cap in map(str,device['capabilities'])) for device in serial_devices]
+
     print("")
     df = pd.DataFrame(table)
 
