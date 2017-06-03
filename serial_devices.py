@@ -86,25 +86,34 @@ serial_devices = []
 for port_number in random.sample(set([1, 2, 3, 4, 5, 6, 7, 8, 9]), 3):
   serial_devices.append(new_serial_device('COM%i' % port_number))
 
+def get_capabilities_from_device(device):
+  
+  capabilities = []
+  for capability in device['capabilities']:
+    cap = copy.copy(device)
+    cap['type'] = capability
+    capabilities.append(cap)
+    
+  return capabilities
+
 def run_simulation():
   global current_data
 
   while(1):
     os.system('cls')  # on windows
 
-    # Update status of capabilities
-    for device in serial_devices:
-      for cap in device['capabilities']:
-        cap.update()
-    
+    capabilities = []
+    list(map(capabilities.extend, [ get_capabilities_from_device(device) for device in serial_devices]))
+
     table = {}
-    table['id'] =   [ device['id'] for device in serial_devices]
-    table['port'] = [ device['port'] for device in serial_devices]
-    table['ttl'] = [ device['ttl'] for device in serial_devices]
-    table['alive'] = [ device['alive'] for device in serial_devices]
+    table['id'] = [ cap['id'] for cap in capabilities]
+    table['port'] = [ cap['port'] for cap in capabilities]
+    table['ttl'] = [ cap['ttl'] for cap in capabilities]
+    table['alive'] = [ cap['alive'] for cap in capabilities]
+    table['type'] = [ str(cap['type']) for cap in capabilities]
 
 
-    table['capabilities'] = [ ",".join("%15s" % cap for cap in map(str,device['capabilities'])) for device in serial_devices]
+    #table['capabilities'] = [ ",".join("%15s" % cap for cap in map(str,device['capabilities'])) for cap in capabilities]
 
     print("")
     df = pd.DataFrame(table)
@@ -120,7 +129,7 @@ def run_simulation():
     df = df.append(df_empty,ignore_index=True)      
     df = df.sort_values(by=["port"], ascending=[True])
     pd.set_option('display.width', 1000)
-    print(df[['port','id','ttl','alive','capabilities']])
+    print(df[['port','id','ttl','alive','type']])
     print("")
 
 
@@ -141,6 +150,10 @@ def run_simulation():
       # Do nothing more if device has been disconnected
       if not serial_devices[index]['alive']:
         continue
+
+      # Update status of capabilities
+      for cap in serial_devices[index]['capabilities']:
+        cap.update()
 
       # Chance that device disconnects 
       if random.random() < 0.15:
