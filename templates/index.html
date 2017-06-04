@@ -39,11 +39,16 @@ $(document).ready(function() {
             { "data": "port" },
             { "data": "id" },
             { "data": "ttl" },
-            { "data": "type" }
+            { "data": "capability" },
+            { "className": "input",  "defaultContent": "", "sortable": false }
         ],
+        "columnDefs": [ {
+            "targets": 4,
+            "createdCell": function (td, cellData, rowData, row, col) {
+                //console.log(td)
+            }
+          } ],
         "createdRow": function ( row, data, dataIndex ) {
-            console.log(row);
-            console.log(data);
             if ( ! data['alive'] ) {
               $(row).addClass( 'not_alive' );
             }
@@ -53,9 +58,22 @@ $(document).ready(function() {
         {
             text: 'Add gyro',
             action: function ( e, dt, node, config ) {
-                $.get('http://localhost:5000/add_device?type=gyro');
+                $.get('http://localhost:5000/add_device?type=gyro', function(data) {
+
+                    $( "#console" ).prepend( $( "<li></li>" ).text(data) );
+                });
             },
             key: { altKey: true, key: 'g' }
+        },
+        {
+            text: 'Add LED',
+            action: function ( e, dt, node, config ) {
+                $.get('http://localhost:5000/add_device?type=led', function(data) {
+
+                    $( "#console" ).prepend( $( "<li></li>" ).text(data) );
+                });
+            },
+            key: { altKey: true, key: 'l' }
         }
         ]
     } );
@@ -73,9 +91,11 @@ $(document).ready(function() {
 
 
 
-<table id="example" class="display" width="100%">
+<table id="example" class="display" width="100%"></table>
+<ul id="console" width="100%">
+</ul>
 
-</table>
+
 
 </body>
 </html>
