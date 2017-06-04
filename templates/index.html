@@ -24,10 +24,32 @@
    display: none;
 }
 
+#device_control {
+    padding: 10px;
+}
+#device_control label {
+    width: 120px;
+}
 
 </style>
 
 <script type="text/javascript">
+
+function get_formatted_html(rowData)
+{
+    html = '';
+    html += '<label>ID</label>' + rowData['id'] + '<br>';
+    html += '<label>Type</label>' + rowData['capability']['type'] + '<br>';
+    html += '<label>Value</label><div class="value">' + rowData['capability']['value'] + '</div>';
+
+
+    if(rowData['capability']['type'] == 'led')
+    {
+        html += '<label>Wanted</label><input type="text" class="wanted" id="'+ rowData['id'] +'"></input><br>';
+        html += '<button>Send</button>';
+    }
+    return html
+}
 
 var selected_id = ""
 
@@ -94,6 +116,19 @@ $(document).ready(function() {
         console.log("Yay")
     });
 
+
+    $('#device_control').on( 'click', 'button', function () {
+            
+            wanted_value = $("#device_control input").val();
+            id = $("#device_control input").attr('id');
+
+            $.get('http://localhost:5000/send_signal?id='+id+'&message='+wanted_value, function(data) {
+
+                    $( "#console" ).prepend( $( "<li></li>" ).text(data) );
+                });
+
+        } );
+
     dt
         .on( 'select', function ( e, dt, type, indexes ) {
             
@@ -103,11 +138,14 @@ $(document).ready(function() {
             if(selected_id == rowData['id'])
             {
                 $("#console").prepend( '<li>same row selected</li>');
-                $("#device_control>.value").text(rowData['capability']['value'])
+                $("#device_control .value").text(rowData['capability']['value'])
             }
             else {
-                $("#console").prepend( '<li>new row selected</li>');
-                $("#device_control").html(rowData['id']+'<div class="value">'+rowData['capability']['value']+'</div>');
+                $("#console").prepend( '<li>'+JSON.stringify(rowData) + '</li>');
+
+                html = get_formatted_html(rowData)
+
+                $("#device_control").html(html);
             }
             selected_id = rowData['id'];
 

@@ -114,9 +114,16 @@ def get_capabilities_from_device(device):
   return capabilities
 
 
-def send_signal():
-  pass
-  # Serial send 
+def send_signal(device_id, message):
+  for device in serial_devices:
+    print(device_id[:-3],device['id'])
+    if device_id[:-3] ==  device['id']:
+      print('c')
+      for cap in device['capabilities']:
+        print(device_id[-3:])
+        if device_id[-3:] in cap['type']:
+          cap['value'] = message
+
 
 def run_simulation():
   global current_data
@@ -129,12 +136,11 @@ def run_simulation():
     list(map(capabilities.extend, [ get_capabilities_from_device(device) for device in serial_devices]))
 
     table = {}
-    table['id'] = [ cap['id'] + cap['capability']['type'][:4] for cap in capabilities]
+    table['id'] = [ cap['id'] + cap['capability']['type'][:3] for cap in capabilities]
     table['port'] = [ cap['port'] for cap in capabilities]
     table['ttl'] = [ cap['ttl'] for cap in capabilities]
     table['alive'] = [ cap['alive'] for cap in capabilities]
     table['capability'] = [ cap['capability'] for cap in capabilities]
-
 
 
     #table['capabilities'] = [ ",".join("%15s" % cap for cap in map(str,device['capabilities'])) for cap in capabilities]
@@ -181,6 +187,13 @@ def run_simulation():
       # Update status of capability
       for cap in serial_devices[index]['capabilities']:
           update_capability(cap)
+
+#          if cap['type'] == 'led':
+#            temp_id = serial_devices[index]['id'] + cap['type'][:3]
+#            send_signal(temp_id, 'updaet_works')
+
+
+
 
       # Chance that device disconnects 
       if random.random() < DEATH_RATE:

@@ -26,14 +26,12 @@ def devices():
 @app.route('/send_signal')
 def send_signal_to_device():
 
-
-
   try:
-    device_port = request.args.get('port')
-    signal = request.args.get('signal')
-    #serial_devices.send_signal(device, signal)
+    device_id = request.args.get('id')
+    message = request.args.get('message')
+    serial_devices.send_signal(device_id, message)
 
-    return "Signal sent to %s" % device_port
+    return "Signal '%s' sent to %s" % (message, device_id)
 
   except NameError as e:
     return "No such devices specified"
