@@ -14,6 +14,9 @@
 <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script>
 <script type="text/javascript" src="//cdn.datatables.net/buttons/1.3.1/js/buttons.print.min.js"></script>
 
+
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.3.1/css/buttons.dataTables.min.css" />
+
 <style type="text/css">
     
 .not_alive {
@@ -44,7 +47,17 @@ $(document).ready(function() {
             if ( ! data['alive'] ) {
               $(row).addClass( 'not_alive' );
             }
+        },
+        dom: 'Bfrtip',
+        buttons: [
+        {
+            text: 'Add gyro',
+            action: function ( e, dt, node, config ) {
+                $.get('http://localhost:5000/add_device?type=gyro');
+            },
+            key: { altKey: true, key: 'g' }
         }
+        ]
     } );
 
 

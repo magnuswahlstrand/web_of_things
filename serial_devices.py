@@ -13,7 +13,7 @@ import copy
 lock = threading.Lock()
 
 current_data = []
-
+not_used_ports = []
 
 class LedDisplay:
 
@@ -64,8 +64,21 @@ def get_capabilities():
   return random.sample(set(possible_capabilities), random.randint(0, len(possible_capabilities)-1))
 
 
-def new_serial_device(port):
+def new_serial_device(port, capabilities=None):
   id_length = 8
+
+  if not capabilities:
+    capabilities = get_capabilities()
+  elif capabilities == 'gyro':
+    capabilities = [Gyro()]
+  elif capabilities == 'temp':
+    capabilities = [TempSensor()]
+  elif capabilities == 'led':
+    capabilities = [LedDisplay()]
+  elif capabilities == 'pressure':
+    capabilities = [PressureSensor()]
+
+
   device_ttl = random.choice([5,10,15]) 
   return {
     'id'            : uuid.uuid4().hex[:id_length+1],
@@ -73,8 +86,13 @@ def new_serial_device(port):
     'ttl'           : device_ttl,
     'max_ttl'       : device_ttl,
     'alive'         : True, # Use to simulate devices disconnecting
-    'capabilities'  : get_capabilities()
+    'capabilities'  : capabilities
   }
+
+def add_device(type):
+  with lock:
+    new_port = random.choice(list(not_used_ports))
+    serial_devices.append(new_serial_device(new_port, type))
 
 def get_device_data():
   with lock:
@@ -96,8 +114,11 @@ def get_capabilities_from_device(device):
     
   return capabilities
 
+
+
 def run_simulation():
   global current_data
+  global not_used_ports
 
   while(1):
     os.system('cls')  # on windows
@@ -167,7 +188,7 @@ def run_simulation():
     for port in not_used_ports:
 
       # Chance that device disconnects 
-      if random.random() < 0.05:
+      if random.random() < 0.00:
         new_device = new_serial_device(port)
         serial_devices.append(new_device)
         print('device "%s" connected on port "%s".' % (new_device['id'], new_device['port']))
