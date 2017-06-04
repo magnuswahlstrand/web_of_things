@@ -123,13 +123,13 @@ def run_simulation():
   global not_used_ports
 
   while(1):
-    #os.system('cls')  # on windows
+    os.system('cls')  # on windows
 
     capabilities = []
     list(map(capabilities.extend, [ get_capabilities_from_device(device) for device in serial_devices]))
 
     table = {}
-    table['id'] = [ cap['id'] for cap in capabilities]
+    table['id'] = [ cap['id'] + cap['capability']['type'][:4] for cap in capabilities]
     table['port'] = [ cap['port'] for cap in capabilities]
     table['ttl'] = [ cap['ttl'] for cap in capabilities]
     table['alive'] = [ cap['alive'] for cap in capabilities]

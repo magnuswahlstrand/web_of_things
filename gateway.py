@@ -56,4 +56,4 @@ if __name__ == '__main__':
     th = threading.Thread(target=serial_devices.run_simulation)
     th.daemon = True
     th.start()
-    app.run(host='0.0.0.0', debug=False, threaded=True)
+    app.run(host='0.0.0.0', debug=True, threaded=True)
